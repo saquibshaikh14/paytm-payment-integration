@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment is in process</title>
+</head>
+<body>
+    <!-- SEND IT ONLY IF PAYTM RESPONSE IS SUCCESSFUL IN INITIATE PAYMENT API RESPONSE -->
+    <center>
+        <h1>Please do not refresh this page...</h1>
+     </center>
+     <form method="post" action="https://securegw-stage.paytm.in/theia/api/v1/showPaymentPage?mid=<%= hiddenInput["mid"]%>&orderId=<%= hiddenInput["orderId"]%>" name="paytm">
+        <table border="1">
+           <tbody>
+              <!-- <input type="hidden" name="mid" value="YOUR_MID_HERE">
+              <input type="hidden" name="orderId" value="YOUR_ORDERID_HERE">
+              <input type="hidden" name="txnToken" value="YOUR_TXNTOKEN_HERE"> -->
+
+              <% for(name in hiddenInput) { %>
+                <input type="hidden" name='<%= name %>' value='<%= hiddenInput[name] %>'>
+               <% } %>
+           </tbody>
+           
+           
+        </table>
+        <script type="text/javascript"> document.paytm.submit(); </script>
+     </form>
+    
+</body>
+</html>
