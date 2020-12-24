@@ -50,6 +50,7 @@ const crypto = require('crypto');
 app.post('/payment', async(req, res)=>{
     //get amount from req.body (or as needed).
     const {amount} = req.body;
+    const orderId = crypto.randomBytes(16).toString("hex");
 
     //create paytmParams for generating checksumhash and txnToken.
     let paytmParams = {};
