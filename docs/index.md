@@ -1,37 +1,98 @@
-## Welcome to GitHub Pages
+# Paytm payment integration (NODEJS)
 
-You can use the [editor on GitHub](https://github.com/saquibshaikh14/paytm-payment-integration/edit/github-page/docs/index.md) to maintain and preview the content for your website in Markdown files.
+Simple and illustrative Paytm payment integration example.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Installation
 
-### Markdown
+Download the repo. Unzip it and use ```npm install``` to install all the dependencies. 
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+```bash
+cd paytm-payment-integration
 
-```markdown
-Syntax highlighted code block
+npm install
+```
+Setup envirnoment variable.
+```env
+MERCHANT_KEY = YOUR_MERCHANT_KEY
+MERCHANT_ID = YOUR_MERCHANT_ID
+```
+## Dependencies
 
-# Header 1
-## Header 2
-### Header 3
+* express
+* ejs
+* nodemon
+* dotenv
+* cors
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
+## Usage
 
-**Bold** and _Italic_ and `Code` text
+```bash
+cd paytm-payment-integration
 
-[Link](url) and ![Image](src)
+npm start
+```
+* Open http://localhost:3000 in your browser
+* Fill up the form and submit
+* It will redirect to paytm payment page
+* Fill the details and complete payment.
+
+## Use in existing project
+Copy ```paytm``` folder in your project
+
+```javaScript
+const {initializePayment, verifyPayemntAuthenticity} = require('./paytm/managePayment');
+
+//use uuid instead of crypto for generating orderId.
+const crypto = require('crypto'); 
+
+//payment route
+app.post('/payment', async(req, res)=>{
+    //get amount from req.body (or as needed).
+    const {amount} = req.body;
+    const orderId = crypto.randomBytes(16).toString("hex");
+
+    //create paytmParams for generating checksumhash and txnToken.
+    let paytmParams = {};
+    paytmParams.body = {
+        "requestType"   : "Payment",
+        "mid"           : process.env.MERCHANT_ID,
+        "websiteName"   : process.env.WEBSITE,
+        "orderId"       : orderId,
+        "callbackUrl"   : "http://localhost:3000/verify-payment",
+        "txnAmount"     : {
+            "value"     : amount,
+            "currency"  : "INR",
+        }
+    };
+
+    //initializePayment returns txnInfo containing txnToken.
+    let txnInfo = await initializePayment(paytmParams);
+
+    //create hidden inputs field from hiddenInput object
+    const hiddenInput = {
+        txnToken    : txnInfo.body.txnToken,
+        mid         : process.env.MERCHANT_ID,
+        orderId     : orderId
+    }
+    //see 'intermediateForm.ejs' for form example.
+});
+
+//callbackUrl.
+//post data sent by paytm with payament information
+app.post('/verify-payment', (req, res)=>{
+    
+    //req.body contains all data sent by paytm related to payment.
+    //check checksumhash to verify transaction is not tampered.
+
+    //verifyPaymentAuthenticity verifies checsumhash and return paymentObject or false(if failed to match or mismatch).
+    const paymentObject = await verifyPayemntAuthenticity(req.body);
+    //do otherstuff i.e. save to database verify for payment completed/aborted/failed etc.
+});
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-### Jekyll Themes
+Please make sure to update tests as appropriate.
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/saquibshaikh14/paytm-payment-integration/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
