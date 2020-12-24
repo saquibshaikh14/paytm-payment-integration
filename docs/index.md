@@ -40,7 +40,7 @@ npm start
 ## Use in existing project
 Copy ```paytm``` folder in your project
 
-```javaScript
+```javascript
 const {initializePayment, verifyPayemntAuthenticity} = require('./paytm/managePayment');
 
 //use uuid instead of crypto for generating orderId.
